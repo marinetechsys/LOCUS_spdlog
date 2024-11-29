@@ -353,14 +353,22 @@ SPDLOG_INLINE size_t _thread_id() SPDLOG_NOEXCEPT {
     #endif
     return static_cast<size_t>(tid);
 #else  // Default to standard C++11 (other Unix)
+#ifndef SPDLOG_NO_THREAD_ID
     return static_cast<size_t>(std::hash<std::thread::id>()(std::this_thread::get_id()));
+#else
+    return 0;
+#endif
 #endif
 }
 
 // Return current thread id as size_t (from thread local storage)
 SPDLOG_INLINE size_t thread_id() SPDLOG_NOEXCEPT {
 #if defined(SPDLOG_NO_TLS)
+#ifndef SPDLOG_NO_THREAD_ID
+    return 0;
+#else
     return _thread_id();
+#endif
 #else  // cache thread id in tls
     static thread_local const size_t tid = _thread_id();
     return tid;
@@ -483,12 +491,12 @@ SPDLOG_INLINE void utf8_to_wstrbuf(string_view_t str, wmemory_buf_t &target) {
 
     // find the size to allocate for the result buffer
     int result_size =
-        ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, NULL, 0);
+        ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.data(), str_size, NULL, 0);
 
     if (result_size > 0) {
         target.resize(result_size);
-        result_size = ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, target.data(),
-                                            result_size);
+        result_size = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.data(), str_size,
+                                            target.data(), result_size);
         if (result_size > 0) {
             assert(result_size == target.size());
             return;

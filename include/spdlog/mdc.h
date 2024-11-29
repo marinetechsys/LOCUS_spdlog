@@ -3,10 +3,6 @@
 
 #pragma once
 
-#if defined(SPDLOG_NO_TLS)
-    #error "This header requires thread local storage support, but SPDLOG_NO_TLS is defined."
-#endif
-
 #include <map>
 #include <string>
 
@@ -42,7 +38,11 @@ public:
     static void clear() { get_context().clear(); }
 
     static mdc_map_t &get_context() {
+#if defined(SPDLOG_NO_TLS)
+        static mdc_map_t context;
+#else
         static thread_local mdc_map_t context;
+#endif
         return context;
     }
 };

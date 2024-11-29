@@ -382,8 +382,8 @@ SPDLOG_CONSTEXPR_FUNC std::basic_string_view<T> to_string_view(
 using std::enable_if_t;
 using std::make_unique;
 #else
-template <bool B, class T = void>
-using enable_if_t = typename std::enable_if<B, T>::type;
+template <bool BType, class T = void>
+using enable_if_t = typename std::enable_if<BType, T>::type;
 
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args &&...args) {

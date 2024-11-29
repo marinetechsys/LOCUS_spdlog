@@ -8,4 +8,11 @@
     #define WIN32_LEAN_AND_MEAN
 #endif
 
+
+// Fix for spdlog / winuser.h / Arduino.h defining INPUT
+#ifdef INPUT
+#undef INPUT
+#endif
+
+
 #include <windows.h>
